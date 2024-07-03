@@ -15,11 +15,11 @@ public static class OperatorStatesService
     {
         var operatorToStateToMinutes = new Dictionary<string, SortedDictionary<string, int>>();
 
-        foreach(var session in sessions)
+        foreach (var session in sessions)
         {
-            if(operatorToStateToMinutes.ContainsKey(session.Operator))
+            if (operatorToStateToMinutes.ContainsKey(session.Operator))
             {
-                if(operatorToStateToMinutes[session.Operator].ContainsKey(session.State))
+                if (operatorToStateToMinutes[session.Operator].ContainsKey(session.State))
                 {
                     operatorToStateToMinutes[session.Operator][session.State] += session.Duration;
                 }
@@ -38,14 +38,16 @@ public static class OperatorStatesService
         return operatorToStateToMinutes;
     }
 
-    private static void OutputOperatorsStatesToConsole(Dictionary<string, SortedDictionary<string, int>> operatorToStateToMinutes)
+    private static void OutputOperatorsStatesToConsole(
+        Dictionary<string, SortedDictionary<string, int>> operatorToStateToMinutes)
     {
-        foreach(var operatorValue in operatorToStateToMinutes)
+        foreach (var operatorValue in operatorToStateToMinutes)
         {
             Console.Write($"{operatorValue.Key} ");
-            foreach(var operatorStateToMinutes in operatorValue.Value)
+            foreach (var operatorStateToMinutes in operatorValue.Value)
             {
-                Console.Write($"{operatorStateToMinutes.Value} мин. в состоянии {operatorStateToMinutes.Key} ");
+                Console.Write(
+                    $"{Math.Round(operatorStateToMinutes.Value / 60.0f, 2)} мин. в состоянии {operatorStateToMinutes.Key} ");
             }
 
             Console.Write("\n");

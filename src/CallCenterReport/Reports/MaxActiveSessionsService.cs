@@ -17,7 +17,7 @@ public static class MaxActiveSessionsService
 
         var sessionTasks = new List<Task<string>>();
 
-        foreach(var bucket in sessionsBucket)
+        foreach (var bucket in sessionsBucket)
         {
             sessionTasks.Add(Task.Run(() => FindMaxActiveSessions(bucket.Value)));
         }
@@ -31,7 +31,7 @@ public static class MaxActiveSessionsService
     {
         var sessionsByDay = new Dictionary<int, List<CallSession>>();
 
-        foreach(var session in sessions)
+        foreach (var session in sessions)
         {
             if (sessionsByDay.ContainsKey(session.SessionStart.Day))
             {
@@ -50,23 +50,23 @@ public static class MaxActiveSessionsService
     {
         var points = new List<Tuple<DateTime, int>>();
 
-        foreach(var session in sessions)
+        foreach (var session in sessions)
         {
             points.Add(Tuple.Create(session.SessionStart, 1));
             points.Add(Tuple.Create(session.SessionEnd, -1));
         }
 
-        points.Sort((a, b) => a.Item1 == b.Item1 
-            ? a.Item2.CompareTo(b.Item2) 
+        points.Sort((a, b) => a.Item1 == b.Item1
+            ? b.Item2.CompareTo(a.Item2)
             : a.Item1.CompareTo(b.Item1));
 
         int maxActiveSessions = 0;
         int currentActiveSessions = 0;
-        foreach(var point in points)
+        foreach (var point in points)
         {
             currentActiveSessions += point.Item2;
 
-            if(currentActiveSessions > maxActiveSessions)
+            if (currentActiveSessions > maxActiveSessions)
             {
                 maxActiveSessions = currentActiveSessions;
             }
@@ -77,7 +77,7 @@ public static class MaxActiveSessionsService
 
     private static void OutputMaxActiveSessionToConsole(IEnumerable<string> maxActiveSessions)
     {
-        foreach(var activeSessionResult in maxActiveSessions.OrderBy(x => x))
+        foreach (var activeSessionResult in maxActiveSessions.OrderBy(x => x))
         {
             Console.WriteLine(activeSessionResult);
         }

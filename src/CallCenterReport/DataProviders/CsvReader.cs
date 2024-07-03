@@ -18,7 +18,7 @@ public static class CsvReader
             {
                 var session = MapFileStringToCallSession(csvLine);
 
-                sessions.Add(session);
+                sessions.AddRange(session);
             }
         }
         catch (Exception e)
@@ -29,18 +29,36 @@ public static class CsvReader
         return sessions;
     }
 
-    private static CallSession MapFileStringToCallSession(string fileLine)
+    private static IEnumerable<CallSession> MapFileStringToCallSession(string fileLine)
     {
         string[] values = fileLine.Split(';', ',');
 
-        return new CallSession
+        var sessionStart = DateTime.ParseExact(values[0], "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+        var sessionEnd = DateTime.ParseExact(values[1], "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+        // If session takes 2 days
+        if (sessionEnd.Day == sessionStart.Day + 1)
         {
-            SessionStart = DateTime.ParseExact(values[0], "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture),
-            SessionEnd = DateTime.ParseExact(values[1], "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture),
+            return new[]
+            {
+                MapLineItemsToCallSession(sessionStart, sessionStart.Date.AddDays(1).AddTicks(-1)),
+                MapLineItemsToCallSession(sessionStart.Date.AddDays(1), sessionEnd, 0)
+            };
+        }
+
+        return new[]
+        {
+            MapLineItemsToCallSession(sessionStart, sessionEnd)
+        };
+
+        CallSession MapLineItemsToCallSession(DateTime sessionStart, DateTime sessionEnd, int? duration = null) => new()
+        {
+            SessionStart = sessionStart,
+            SessionEnd = sessionEnd,
             Project = values[2],
             Operator = values[3],
             State = values[4],
-            Duration = int.Parse(values[5])
+            Duration = duration ?? int.Parse(values[5])
         };
     }
 }
